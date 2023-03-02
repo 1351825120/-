@@ -1,0 +1,452 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package javaapplication1;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.math.BigInteger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ *
+ * @author user
+ */
+public class JavaApplication1 
+{
+    public static char point1[][] = new char[15][15];
+     public static char point2[][] = new char[15][15];
+    public static int score[][] = new int[15][15];
+      StringBuilder total = new StringBuilder("");
+    public static String QP = "ggffhggfhffgiefhfeheidehdidhghegcidfgiefcfeeeied";
+    // 7 public static String board = "ghhggggfgigjhhfhiijjfghiihigjhkhhjgkjgffhfkgjijfiejdjeheidkfkikekdlfmgmfifnf";
+    public static String board = "hhifhjigkhjghghiihjhkjjijjij";
+    public static String xy = "abcdefghijklmno";
+    public static String coord[] = new String[]{"nk", "ok", "bn", "ef", "lk", "im", "gb", "fd", "ha"};
+    public static String[][] WG = new String[15][15];//网格棋盘
+    private static void initPP() {
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                WG[i][j] = ".";
+            }
+        }
+    }
+
+//             public static BigInteger str2num(String s)
+//     {
+//        s=new StringBuffer(s).reverse().toString();
+//        BigInteger total=new BigInteger("0");
+//        int l=s.length();
+//        for(int i=0;i<l;i++){
+//            char c=s.charAt(i);
+//            BigInteger m=new BigInteger("256");
+//            m=m.pow(i);
+//            BigInteger n=new BigInteger(String.valueOf((int)(c)));
+//            total=total.add(m.multiply(n));
+//        }
+//    return total;
+//    }
+//    
+    
+    
+    
+    public static int findnum(char a) 
+    {
+        for (int i = 0; i < 15; i++) {
+            if (xy.charAt(i) == a) {
+                //System.out.println(i);
+                return i;
+            }
+        }
+        return -10;
+    }
+
+    public static StringBuilder changeWG(int x, int y, int type) 
+    {
+        StringBuilder s = new StringBuilder("");
+        if (type == 1) {
+            WG[y][x] = "x";
+        } else if (type == 2) {
+            WG[y][x] = "o";
+        }
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                s.append(WG[j][i]);
+            }
+        }
+        return s;
+    }
+    //public static BigInteger a=new BigInteger("9458304855319514267008380514866");//hello, world!         
+//      public static BigInteger b=new BigInteger("450394869827");
+//       public static BigInteger c=new BigInteger("2136");
+//         public static BigInteger d=new BigInteger("6026");
+//           public static BigInteger e=new BigInteger("787296602");
+//             public static BigInteger f=new BigInteger("864745305");
+//               public static BigInteger g=new BigInteger("4165");
+//                 public static BigInteger h=new BigInteger("398189032");
+//                   public static BigInteger i=new BigInteger("974657695");
+//                     public static BigInteger j=new BigInteger("31415926");
+
+//    BigInteger a=new BigInteger("744514414472");
+//   BigInteger b=new BigInteger("559362725");
+//   BigInteger c=new BigInteger("935740772056");
+//   BigInteger d=new BigInteger("(a.modPow(b,c))");
+//    BigInteger e=new BigInteger("744514414472");
+//   BigInteger f=new BigInteger("559362725");
+//   BigInteger g=new BigInteger("935740772056");
+//   BigInteger h=new BigInteger("String.valueOf(e.modPow(f,g))");
+//    BigInteger i=new BigInteger("744514414472");
+//   BigInteger j=new BigInteger("559362725");
+//   BigInteger k=new BigInteger("935740772056");
+//   BigInteger l=new BigInteger("String.valueOf(i.modPow(j,k))");
+//   BigInteger m=new BigInteger("744514414472");
+//   BigInteger n=new BigInteger("559362725");
+//   BigInteger o=new BigInteger("935740772056");
+//   BigInteger p=new BigInteger("String.valueOf(m.modPow(n,o))");
+//   BigInteger q=new BigInteger("744514414472");
+//   BigInteger r=new BigInteger("559362725");
+//   BigInteger s=new BigInteger("935740772056");
+//   BigInteger t=new BigInteger("String.valueOf(q.modPow(r,s))");
+//   BigInteger u=new BigInteger("744514414472");
+//   BigInteger v=new BigInteger("559362725");
+//   BigInteger w=new BigInteger("935740772056");
+//   BigInteger x=new BigInteger("String.valueOf(u.modPow(v,w))");
+//   BigInteger y=new BigInteger("744514414472");
+//   BigInteger z=new BigInteger("559362725");
+//   BigInteger a1=new BigInteger("935740772056");
+//   BigInteger b1=new BigInteger("String.valueOf(y.modPow(z,a1))");
+//    BigInteger c1=new BigInteger("744514414472");
+//   BigInteger d1=new BigInteger("559362725");
+//   BigInteger e1=new BigInteger("935740772056");
+//   BigInteger f1=new BigInteger("String.valueOf(c1.modPow(d1,e1))");
+//    BigInteger g1=new BigInteger("744514414472");
+//   BigInteger h1=new BigInteger("559362725");
+//   BigInteger i1=new BigInteger("935740772056");
+//   BigInteger j1=new BigInteger("String.valueOf(g1.modPow(h1,i1))");
+//    BigInteger k1=new BigInteger("744514414472");
+//   BigInteger l1=new BigInteger("559362725");
+//   BigInteger m1=new BigInteger("935740772056");
+//   BigInteger n1=new BigInteger("String.valueOf(k1.modPow(l1,m1))");
+    public static String getHTML(String urlToRead) throws Exception {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlToRead);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        rd.close();
+        return result.toString();
+    }
+
+    public static void main(String[] args) throws Exception
+    {
+        initPP();
+        int i = 0, h = 0, k = 0, l = 0, m = 0;
+        int p11 = 0, q11 = 0;
+        int p22 = 0, q22 = 0;
+        char point = 'x';
+        char point2 = 'o';
+        
+        for (k = 0; k < 15; k++) {
+            for (l = 0; l < 15; l++) {
+                point1[k][l] = '.';
+            }
+        }
+        while (i < board.length() - 1) {
+            p11 = board.charAt(i) - 'a';//转换数字
+            q11 = board.charAt(i + 1) - 'a';
+            i += 2;
+            if (h % 2 == 0) {
+                point1[p11][q11] = point;
+            } else {
+                point1[p11][q11] = point2;
+            }
+            h += 1;
+        }
+        find_8();
+      
+//                for(int x=0;x<15;x++)
+//                {
+//                    for(int y=0;y<15;y++)
+//                    {
+//                        System.out.print(point1[x][y]);
+//                    }
+//                    System.out.println();
+//                }
+        
+
+
+
+
+
+
+
+
+
+        //System.out.println((a.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")).toString(16)));
+        // String h="512e67a34e702b6bca8a9492b318c252a3725e7539e79ec45c29cbd117fdfc68fb32e1d509d95fc0591df7ae7e527730f4e402baf789fbebf6816dc7272b21b1da3960d1c14f8760db62580474821976e82114299f91ed27a685e7c0cdff9f818ed4fb6107884355f0d49b44e5aa6f0f626cccffb2f2babf3d5ec8ffc8b516d7";
+        // String my_h=new java.math.BigInteger(h,16).toString(10);
+        //String h1="14542435050728056395239626617837738192833713959477321600679469132842019015905926047932847572234274904632668991300565250985685891025326831243836091653259947057263193570554348464562601203501948186231683916348544197850014503973332987996464503279924641896441443813744477653711936793713872643535304759990756784584";
+        //System.out.println(my_h);
+//       System.out.println(Integer.toHexString(10));
+        //System.out.println(str2num("wanghao990522"));
+
+
+
+        //System.out.println(a.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")));
+//     System.out.println(b.modPow(new BigInteger("717234262"), new BigInteger("9791")));
+//     System.out.println(c.modPow(new BigInteger("938408201856"), new BigInteger("612752924963")));
+//     System.out.println(d.modPow(new BigInteger("754904536976"), new BigInteger("5916")));
+//     System.out.println(e.modPow(new BigInteger("305437915"), new BigInteger("661501280")));
+//     System.out.println(f.modPow(new BigInteger("6963"), new BigInteger("484799723855")));
+//     System.out.println(g.modPow(new BigInteger("110707859589"), new BigInteger("102613824")));
+//     System.out.println(h.modPow(new BigInteger("723455558974"), new BigInteger("794842765789")));
+//     System.out.println(i.modPow(new BigInteger("138141973218"), new BigInteger("760159826372")));
+//     System.out.println(j.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")));
+
+
+
+
+//       
+//      BigInteger h=new BigInteger("482835261960335156517605818499221862807174956635225645085624235199206138685439605750884126652587271224554897029711186396352311642440612170680748747908283823542157100073982070377009251506645288429051399777471447556757513934127376279969615673460");
+//      BigInteger oldm=new BigInteger("256");
+//      BigInteger oldz=new BigInteger("256");
+//      char[]MY=new char[200];
+//      int i=0;
+//       while(h.intValue()>0)
+//      {
+//     int oldh=h.remainder(oldm).intValue();
+//      // System.out.println(oldh);
+//      MY[i]=(char)oldh;
+//         h=h.divide(oldm);
+//         i++;
+//      }
+//       for(i=MY.length-1;i>=0;i--)
+//       {
+//           System.out.print(MY[i]);
+//       }
+//       
+
+//     5.3 System.out.println(getHTML("http://202.207.12.223:8000/step_05?str=41717036756922086167767786786712423269418006844571540642506559265291791915434146228186913317848309015094527019477424371059092802944619669306914382602706827360526972065492061812094685980946805703427198780190727908992795654922187272049190698839062058797703366041101170679313306423879973490422740979302379859262"));
+        //5.4 System.out.println(getHTML("http://202.207.12.223:8000/step_05?hex=3b68334487f782c227eefff8510c6d7b8568e50580e1d585360df7b381c15bc663ab6e867a475b52921ef254cfcbe328e074d5761e605b6aa8ab608fc9914a58d1120294986dcff70b46e92fa7d48edf4dbb104fa272eb459e8896e29d5d0473f75bb866d9f73ec1c134d827156ee355d19bdd94b8d73fe2526ada033a5cad3e"));
+        //5System.out.println(getHTML("http://202.207.12.223:8000/step_05?user=0161121560&password=a4d5bbd9fbd51c87b98eb0049da3c5a88898aab0eac0a7f9e0e5c99b85d08135dd162b5f5e6087d2602d78f3809dd50c5ac1d75754b1c643c57ba8cd152ed1e7879165340862a25d0a50423ace629de167f2043fd4ce0222998b1c18501d6188d98581b6449967f73ea1cc11b7652806fa70042b87b1a1aa90eb187172c2333c"));
+
+//        System.out.print(getHTML("http://202.207.12.223:8000/step_06?ans="+ changeWG(findnum('g'), findnum('g'), 1) +","+changeWG(findnum('f'), findnum('f'), 2)+","+
+//                changeWG(findnum('h'), findnum('g'), 1)+","+changeWG(findnum('g'), findnum('f'), 2)+","+changeWG(findnum('h'), findnum('f'), 1)+","+changeWG(findnum('f'), findnum('g'), 2)+
+//                ","+changeWG(findnum('i'), findnum('e'), 1)+","+ changeWG(findnum('f'), findnum('h'), 2)+","+changeWG(findnum('f'), findnum('e'), 1)+","+changeWG(findnum('h'), findnum('e'), 2)+
+//                ","+changeWG(findnum('i'), findnum('d'), 1)+","+changeWG(findnum('e'), findnum('h'), 2)+","+ changeWG(findnum('d'), findnum('i'), 1)+","+changeWG(findnum('d'), findnum('h'), 2)+","
+//                +changeWG(findnum('g'), findnum('h'), 1)+","+changeWG(findnum('e'), findnum('g'), 2)+","+changeWG(findnum('c'), findnum('i'), 1)+","+ changeWG(findnum('d'), findnum('f'), 2)+","
+//                +changeWG(findnum('g'), findnum('i'), 1)+","+changeWG(findnum('e'), findnum('f'), 2)+","+changeWG(findnum('c'), findnum('f'), 1)+","+changeWG(findnum('e'), findnum('e'), 2)+","+
+//                changeWG(findnum('e'), findnum('i'), 1)+","+changeWG(findnum('e'), findnum('d'), 2)));
+    // System.out.print(getHTML("http://202.207.12.223:8000/step_07?ans=.........,xo....,......,......,.........,o....,.....,.....,......,...,......,......,.........,.....xxo.,.....ooxx,.........,.........,oxx.....,........,........,x......,..o....,.........,.......,.....o,...xxo,.........,......,.....oxo,.....xox,.......xo,........,....o,...x.,.........,....."));
+
+       System.out.print(getHTML("http://202.207.12.223:8000/step_08"));
+       //?ans=ki,he,ih,le,hg,ia,eh,gi,ge,hi,ke,kh,gl,gm,hi,kh,lf
+    }
+   
+    //第七步
+//        public static StringBuilder find(String coord[])
+//    {
+//        int  m ;
+//       StringBuilder total = new StringBuilder("");
+//        int p11 = 0, q11 = 0;
+//        for (m = 0; m < coord.length; m++) 
+//        {
+//            String s = coord[m];
+//            int yy = 0;
+//            while (yy < s.length() - 1) 
+//            {
+//                int s2,s4;
+//                p11 = s.charAt(yy) - 'a';//转换数字
+//                q11 = s.charAt(yy + 1) - 'a';
+//                for (s2 = p11, s4 = q11 - 4; s4 <=q11 + 4; s4++) 
+//                {
+//                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15))
+//                    {    
+//                        //  StringBuilder total = new StringBuilder("");
+//                       // total.append(point1[s2][s4]);
+//                        //System.out.print(point1[s2][s4]);
+//                        
+//                    }
+//                      
+//                }
+//                //System.out.print(",");
+//                 yy+=2;
+//                for (s2 = p11 - 4, s4 = q11 - 4; s4 <= q11 + 4 && s2 <= p11 + 4; s4++, s2++)
+//                {
+//                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15))
+//                    {
+//                        // System.out.print(point1[s2][s4]);
+//                        //System.out.print(total);
+//                        
+//                    }
+//                     
+//                }
+//                 //System.out.print(",");
+//                for (s2 = p11 - 4, s4 = q11; s2 <= p11 + 4; s2++)
+//                {
+//                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15)) 
+//                    {
+//                         //System.out.print(point1[s2][s4]);
+//                    }
+//                      
+//                }
+//                //System.out.print(",");
+//                for (s2 = p11 + 4, s4 = q11 - 4; s4 <= q11 + 4 && s2>=p11 - 4; s4++, s2--) 
+//                {
+//                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15)) 
+//                    {
+//                        //System.out.print(point1[s2][s4]);
+//                    }
+//                    
+//                }
+//                  //if(m<coord.length-1)
+//                  //System.out.println(",");
+//            }
+//            
+//        }
+//        return total;
+//       
+//    }
+    
+    
+    
+    
+    
+    
+    //第八步
+ 
+         public static void find_8()
+         {
+              int ii,jj;
+                   for(ii=0;ii<15;ii++)
+             {
+                 for(jj=0;jj<15;jj++)
+                 {
+                     if(point1[ii][jj]=='x')
+                         point1[ii][jj]='M'; 
+                 }
+             }
+              for(ii=0;ii<15;ii++)
+             {
+                 for(jj=0;jj<15;jj++)
+                 {
+                    score[ii][jj]=0;
+                 }
+             }
+              for(ii=0;ii<15;ii++)
+              {
+                  for(jj=0;jj<15;jj++)
+                      point2[ii][jj]=0;
+    
+              }
+               for(ii=0;ii<15;ii++)
+             {
+                 for(jj=0;jj<15;jj++)
+                 {
+                    if(point1[ii][jj]=='.')
+                    {
+                        point1[ii][jj]='c';
+                        int s2=ii,s4=jj;
+                         int h=0,m=0,n=0,p=0;
+                         for (s2 = ii, s4 = jj - 4; s4 <=jj + 4; s4++) 
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15))
+                    {   
+                       char s=point1[S2][S4];
+                        //  StringBuilder total = new StringBuilder("");
+                       // total.append(point1[s2][s4]);
+                        //System.out.print(point2[0][h]);
+                        h++;
+                        
+                    }
+                      
+                }
+                //System.out.print(",");
+                // yy+=2;
+                for (s2 = ii - 4, s4 = jj - 4; s4 <= jj + 4 && s2 <= ii + 4; s4++, s2++)
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15))
+                    {
+                         point2[0][m]=point1[s2][s4];
+                        // System.out.print(point1[s2][s4]);
+                        //System.out.print(total);
+                         //System.out.print(point2[0][m]);
+                         m++;
+                        
+                    }
+                     
+                }
+                 //System.out.print(",");
+                for (s2 = ii - 4, s4 = jj; s2 <= ii + 4; s2++)
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15)) 
+                    {
+                         point2[0][n]=point1[s2][s4];
+                         //System.out.print(point1[s2][s4]);
+                         //System.out.print(point2[0][n]);
+                         n++;
+                    }
+                      
+                }
+                //System.out.print(",");
+                for (s2 = ii + 4, s4 = jj - 4; s4 <= jj + 4 && s2>=ii - 4; s4++, s2--) 
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15)) 
+                    {
+                         point2[0][p]=point1[s2][s4];
+                        //System.out.print(point1[s2][s4]);
+                         //System.out.print(point2[0][p]);
+                         p++;
+                    }
+                    
+                }
+               // System.out.println(point2);
+                    
+                    }
+                 }
+             }
+         
+         
+         
+         }
+         public static int totalscore(String s,int aI,int b)
+         {
+             int totallI;
+             if(s=="CMMMM"||s=="MCMMM"||s=="MMCMM"||s=="MMMCM"||s=="MMMMC")
+             {
+                 return totallI=10000;
+             }
+             else if(s=="OOOOC"||s=="COOOO")
+             {return totallI=6000;}
+             else if(s==".CMMM."||s==".MCMM."||s==".MMCM."||s==".MMMC.")
+             {return totallI=5000;}
+             else if(s=="COOO."||s==".OOOC"||s==".OOCO."||s==".OCOO.")
+             {return totallI=2500;}
+             else if(s=="OCMMM."||s=="OMCMM."||s=="OMMCM."||s=="OMMMC."||s==".CMMMO"||s==".MCMMO"||s==".MMCMO"||s==".MMMCO")
+             {return totallI=2000;}
+             else if(s==".MMC."||s==".MCM."||s==".CMM.")
+             {return totallI=400;}
+             else if(s==".OOC"||s=="COO."||s=="MOOOC"||s=="COOOM")
+             {return totallI=400;}
+             else if(s==".MMCO"||s==".MCMO"||s==".CMMO"||s=="OMMC."||s=="OMCM."||s=="OCMM."||s=="MOOC"||s=="COOM")
+             {return totallI=500;}
+             else if(s==".MC."||s==".CM.")
+             {return totallI=50;}
+             else
+             {return totallI=20;} 
+         
+         }
+}

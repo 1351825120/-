@@ -1,0 +1,814 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package step_jump;
+
+/**
+ *
+ * @author user
+ */
+import java.math.BigInteger;
+import java.io.*;
+import java.net.*;
+import java.lang.*;
+import java.lang.Integer;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import net.sf.json.JSONObject;
+
+
+
+
+public class Step_jump {
+
+   
+public static BigInteger a1=new BigInteger("3224115");
+   
+    public static String getHTML(String urlToRead) throws Exception //服务器请求
+    {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlToRead);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        rd.close();
+        return result.toString();
+    }  
+
+
+    public static String SelectPoint(String s) //获得每一个位置的权重
+    {
+        int sum[];//返回每一个位置的分数
+        int p = 0;
+        int q = 0;
+        sum = new int[225];
+        int summax[];
+        int max=0; int tag=0;
+        summax = new int[225];
+        for (int i = 0; i < 225; i++) //初始化
+        {
+            sum[i] = 0;
+            summax[i] = 0;
+        }
+     int hang=0;int lie=0;String cshanglie=new String();
+     char chang;char clie;
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        String s1 = new String();
+        int temp = 1;
+        for (int j = 0; j < 15; j++) {     //初始化棋盘
+            for (int k = 0; k < 15; k++) {
+                sb1.append(".");
+            }
+        }
+        s1 = sb1.toString();
+        for (int i = 0; i < s.length(); i += 2) {
+            char a = s.charAt(i);
+            char b = s.charAt(i + 1);
+            // System.out.println(a);
+            // System.out.println(b);
+            int index = (a - 'a') * 15 + b - 'a';
+            if (temp == 1) {
+                sb1.replace(index, index + 1, "x");
+                temp = 2;
+            } else if (temp == 2) {
+                sb1.replace(index, index + 1, "o");
+                temp = 1;
+            }
+            sb.append(",");
+            sb.append(sb1.toString());
+            s1 = sb1.toString();
+            sb1 = new StringBuilder();
+            sb1.append(s1);
+        }
+        //sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(0); //删掉第一个
+       // System.out.println(s1);//s1是最终棋盘形式
+
+        StringBuilder headx = new StringBuilder();//黑子为M的分数
+        StringBuilder heado = new StringBuilder();//白子为M的分数
+        String s_headx = new String();
+        String s_heado = new String();
+        headx.append(s1);
+        heado.append(s1);
+        s_headx = s1;
+        s_heado = s1;
+        s_headx = s_headx.replaceAll("x", "M");
+        s_headx = s_headx.replaceAll("o", "O");
+        s_heado = s_heado.replaceAll("o", "M");
+        s_heado = s_heado.replaceAll("x", "O");
+      //  System.out.println(s_headx);//黑子棋盘
+       // System.out.println(s_heado);//白子棋盘
+        //System.out.println(temp);//下一步是黑棋下还是白棋下
+        if (temp == 1) {
+            for (q = 0; q < 225; q++) {
+                if (s_headx.charAt(q) == '.'){
+                    sum[q] = GetAround(s_headx, q);
+                }
+             
+            }
+            for(int i=0;i<225;i++)
+            {
+                if(sum[0]<sum[i])
+                {
+                    int mmp=0;
+                    mmp=sum[0];
+                    sum[0]=sum[i];
+                    sum[i]=mmp;
+                    tag=i;
+                }
+            }
+          //  System.out.println(sum[0]);
+              //  int index = (a - 'a') * 15 + b - 'a';
+                hang=tag/15;
+                lie=tag%15;
+               hang=hang+(int)'a';chang=(char)hang;      //将数字坐标转化为字母坐标
+               lie=lie+(int)'a';clie=(char)lie;
+               cshanglie=""+chang+clie;
+         //  System.out.println(chang);
+         //  System.out.println(clie);
+         //  System.out.println(cshanglie);
+         }
+            if (temp == 2) {
+                for (p = 0; p < 225; p++) {
+                    if (s_heado.charAt(p) == '.') {
+                        sum[p] = GetAround(s_heado, p);
+                    }
+                }
+                for(int i=0;i<225;i++)
+            {
+                if(sum[0]<sum[i])
+                {
+                     int mmp=0;
+                    mmp=sum[0];
+                    sum[0]=sum[i];
+                    sum[i]=mmp;
+                    tag=i;
+                }
+            }
+            //    System.out.println(sum[0]);
+                 hang=tag/15;
+                 lie=tag%15;
+                hang=hang+(int)'a';chang=(char)hang;
+                lie=lie+(int)'a';clie=(char)lie;
+                 cshanglie=""+chang+clie;
+            //    System.out.println(chang);
+            //   System.out.println(clie);
+            //     System.out.println(cshanglie);
+            }
+          
+        return cshanglie;
+    }   
+       
+    public static int GetAround(String s, int around) //考察点的棋型7
+    {
+
+        String a_sb = new String();
+        StringBuilder b_sb1 = new StringBuilder();
+        StringBuilder b_sb2 = new StringBuilder();
+        StringBuilder b_sb3 = new StringBuilder();
+        StringBuilder b_sb4 = new StringBuilder();
+        StringBuilder b_sb12 = new StringBuilder();
+        StringBuilder b_sb13 = new StringBuilder();
+        StringBuilder b_sb14 = new StringBuilder();
+        StringBuilder b_sb23 = new StringBuilder();
+        StringBuilder b_sb24 = new StringBuilder();
+        StringBuilder b_sb34 = new StringBuilder();
+        StringBuilder b_sb = new StringBuilder();
+
+        int sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0,sum12=0,sum13=0,sum14=0,sum23=0,sum24=0,sum34=0;
+        int sum = 0;
+        b_sb = b_sb.append(s);
+        b_sb.replace(around, around + 1, "C");
+        a_sb = b_sb.toString();
+        //char a=around.charAt(j);
+        //char b=around.charAt(j+1);
+        //  System.out.println(a);//输出横坐标
+        // System.out.println(b);//输出纵坐标
+        // int index=(a-'a')*15+b-'a';//在一维数组中获得该点的数字位置
+        int index = around;//将C那个点给index
+
+        for (int k = 0; k < 225; k++) {
+            if (k == index - 4 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index - 3 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index - 2 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index - 1 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index && k >= 0) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index + 1 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index + 2 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index + 3 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+            if (k == index + 4 && k / 15 == index / 15) {
+                b_sb1.append(a_sb.charAt(k));
+            }
+        }
+        sum1 = score(b_sb1.toString());//调用score函数
+        //  System.out.println(b_sb1);
+        //b_sb.append(",");
+
+        for (int k = 0; k < 225; k++) {
+            if (k == index - 64 && (Math.abs((k % 15) - (index % 15)) < 6))//列数的绝对值差为1
+            {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index - 48 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index - 32 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index - 16 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index + 16 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index + 32 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index + 48 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+            if (k == index + 64 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb2.append(a_sb.charAt(k));
+            }
+        }
+        //b_sb.append(",");
+        sum2 = score(b_sb2.toString());
+        //   System.out.println(b_sb2);
+
+        for (int k = 0; k < 225; k++) {
+            if (k == index - 60 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index - 45 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index - 30 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index - 15 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index + 15 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index + 30 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index + 45 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+            if (k == index + 60 && k >= 0) {
+                b_sb3.append(a_sb.charAt(k));
+            }
+        }
+        // b_sb.append(",");
+        sum3 = score(b_sb3.toString());
+        //  System.out.println(b_sb3);
+
+        for (int k = 0; k < 225; k++) {
+            if (k == index - 56 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index - 42 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index - 28 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index - 14 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index + 14 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index + 28 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index + 42 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+            if (k == index + 56 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+                b_sb4.append(a_sb.charAt(k));
+            }
+        }
+        //b_sb.append(",");
+        sum4 = score(b_sb4.toString());
+        // System.out.println(b_sb4);
+        // b_sb12=b_sb12.append(b_sb1); b_sb12=b_sb12.append(b_sb2); sum12=score(b_sb12.toString());
+        // b_sb13=b_sb13.append(b_sb1); b_sb13=b_sb13.append(b_sb3); sum13=score(b_sb13.toString());
+         //b_sb14=b_sb14.append(b_sb1); b_sb14=b_sb14.append(b_sb4); sum14=score(b_sb14.toString());
+         //b_sb23=b_sb23.append(b_sb2); b_sb23=b_sb23.append(b_sb3); sum23=score(b_sb23.toString());
+        // b_sb24=b_sb24.append(b_sb2); b_sb24=b_sb24.append(b_sb4); sum24=score(b_sb24.toString());
+        // b_sb34=b_sb34.append(b_sb3); b_sb34=b_sb34.append(b_sb4); sum34=score(b_sb34.toString());
+        //System.out.println(sum1 + sum2 + sum3 + sum4);
+        sum = sum1 + sum2 + sum3 + sum4;
+        return sum;
+    }
+
+    public static int score(String s) //获得一个点一条线的权重
+    {
+        int sum = 0;
+
+        String str1_1 = new String();
+        str1_1 = "CMMMM";
+        String str1_2 = new String();
+        str1_2 = "MCMMM";
+        String str1_3 = new String();
+        str1_3 = "MMCMM";
+        String str1_4 = new String();
+        str1_4 = "MMMCM";
+        String str1_5 = new String();
+        str1_5 = "MMMMC";
+        int scr1 = 100000;
+        if (s.indexOf(str1_1) > -1) {
+            sum = sum + scr1;
+           
+        }
+        if (s.indexOf(str1_2) > -1) {
+            sum = sum + scr1;
+           
+        }
+        if (s.indexOf(str1_3) > -1) {
+            sum = sum + scr1;
+            
+        }
+        if (s.indexOf(str1_4) > -1) {
+            sum = sum + scr1;
+        }
+        if (s.indexOf(str1_5) > -1) {
+            sum = sum + scr1;
+        }
+
+        String str2_1 = new String();
+        str2_1 = "OOOOC";
+        String str2_2 = new String();
+        str2_2 = "COOOO";
+        String str2_3 = new String();
+        str2_3 = "OCOOO";
+        String str2_4 = new String();
+        str2_4 = "OOCOO";
+        String str2_5 = new String();
+        str2_5 = "OOOCO";
+        int scr2 = 8000;
+        if (s.indexOf(str2_1) > -1) {
+            sum = sum + scr2;
+        }
+        if (s.indexOf(str2_2) > -1) {
+            sum = sum + scr2;
+        }
+        if (s.indexOf(str2_3) > -1) {
+            sum = sum + scr2;
+        }
+        if (s.indexOf(str2_4) > -1) {
+            sum = sum + scr2;
+        }
+        if (s.indexOf(str2_5) > -1) {
+            sum = sum + scr2;
+        }
+
+        String str3_1 = new String();
+        str3_1 = ".CMMM.";
+        String str3_2 = new String();
+        str3_2 = ".MCMM.";
+        String str3_3 = new String();
+        str3_3 = ".MMCM.";
+        String str3_4 = new String();
+        str3_4 = ".MMMC.";
+        int scr3 = 5000;
+        if (s.indexOf(str3_1) > -1) {
+            sum = sum + scr3;
+        }
+        if (s.indexOf(str3_2) > -1) {
+            sum = sum + scr3;
+        }
+        if (s.indexOf(str3_3) > -1) {
+            sum = sum + scr3;
+        }
+        if (s.indexOf(str3_4) > -1) {
+            sum = sum + scr3;
+        }
+
+        String str4_1 = new String();
+        str4_1 = "COOO.";
+        String str4_2 = new String();
+        str4_2 = ".OOOC";
+        String str4_3 = new String();
+        str4_3 = ".OOCO.";
+        String str4_4 = new String();
+        str4_4 = ".OCOO.";
+        int scr4 = 3500;
+        if (s.indexOf(str4_1) > -1) {
+            sum = sum + scr4;
+        }
+        if (s.indexOf(str4_2) > -1) {
+            sum = sum + scr4;
+        }
+        if (s.indexOf(str4_3) > -1) {
+            sum = sum + scr4;
+        }
+        if (s.indexOf(str4_4) > -1) {
+            sum = sum + scr4;
+        }
+
+        String str5_1 = new String();
+        str5_1 = "OCMMM.";
+        String str5_2 = new String();
+        str5_2 = "OMCMM.";
+        String str5_3 = new String();
+        str5_3 = "OMMCM.";
+        String str5_4 = new String();
+        str5_4 = "OMMMC.";
+        String str5_5 = new String();
+        str5_5 = ".CMMMO";
+        String str5_6 = new String();
+        str5_6 = ".MCMMO";
+        String str5_7 = new String();
+        str5_7 = ".MMCMO";
+        String str5_8 = new String();
+        str5_8 = ".MMMCO";
+        int scr5 = 2000;
+        if (s.indexOf(str5_1) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_2) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_3) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_4) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_5) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_6) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_7) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_8) > -1) {
+            sum = sum + scr5;
+        }
+
+        String str6_1 = new String();
+        str6_1 = ".MMC.";
+        String str6_2 = new String();
+        str6_2 = ".MCM.";
+        String str6_3 = new String();
+        str6_3 = ".CMM.";
+        int scr6 = 400;
+        if (s.indexOf(str6_1) > -1) {
+            sum = sum + scr6;
+        }
+        if (s.indexOf(str6_2) > -1) {
+            sum = sum + scr6;
+        }
+        if (s.indexOf(str6_3) > -1) {
+            sum = sum + scr6;
+        }
+
+        String str7_1 = new String();
+        str7_1 = ".OOC";
+        String str7_2 = new String();
+        str7_2 = "COO.";
+        String str7_3 = new String();
+        str7_3 = "MOOOC";
+        String str7_4 = new String();
+        str7_4 = "COOOM";
+        String str7_5 = new String();
+        str7_5 = ".OCO";
+        String str7_6 = new String();
+        str7_6 = "OCO.";
+        int scr7 = 400;
+        if (s.indexOf(str7_1) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_2) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_3) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_4) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_5) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_6) > -1) {
+            sum = sum + scr7;
+        }
+
+        String str8_1 = new String();
+        str8_1 = ".MMCO";
+        String str8_2 = new String();
+        str8_2 = ".MCMO";
+        String str8_3 = new String();
+        str8_3 = ".CMMO";
+        String str8_4 = new String();
+        str8_4 = "OMMC.";
+        String str8_5 = new String();
+        str8_5 = "OMCM.";
+        String str8_6 = new String();
+        str8_6 = "OCMM.";
+        String str8_7 = new String();
+        str8_7 = "MOOC";
+        String str8_8 = new String();
+        str8_8 = "COOM";
+        int scr8 = 200;
+        if (s.indexOf(str8_1) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_2) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_3) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_4) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_5) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_6) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_7) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_8) > -1) {
+            sum = sum + scr8;
+        }
+
+        String str9_1 = new String();
+        str9_1 = ".MC.";
+        String str9_2 = new String();
+        str9_2 = ".CM.";
+        int scr9 = 100;
+        if (s.indexOf(str9_1) > -1) {
+            sum = sum + scr9;
+        }
+        if (s.indexOf(str9_2) > -1) {
+            sum = sum + scr9;
+        }
+        
+        String str10_1 = new String();
+        str10_1 = ".OC.";
+        String str10_2 = new String();
+        str10_2 = ".CO.";
+        int scr10 = 50;
+        if (s.indexOf(str10_1) > -1) {
+            sum = sum + scr10;
+        }
+        if (s.indexOf(str10_2) > -1) {
+            sum = sum + scr10;
+        }
+        
+
+        int scr_other = 20;
+        if (sum == 0) {
+            sum = sum + scr_other;
+        }//其他棋型
+
+        return sum;
+    }
+
+    public static StringBuilder GetMap(String s) //得到每一步棋的地图6
+    {
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        String s1 = new String();
+        int temp = 1;
+        for (int j = 0; j < 15; j++) {     //初始化棋盘
+            for (int k = 0; k < 15; k++) {
+                sb1.append(".");
+            }
+        }
+        s1 = sb1.toString();
+        for (int i = 0; i < s.length(); i += 2) {
+            char a = s.charAt(i);
+            char b = s.charAt(i + 1);
+            System.out.println(a);
+            System.out.println(b);
+            int index = (a - 'a') * 15 + b - 'a';
+            if (temp == 1) {
+                sb1.replace(index, index + 1, "x");
+                temp = 2;
+            } else if (temp == 2) {
+                sb1.replace(index, index + 1, "o");
+                temp = 1;
+            }
+            sb.append(",");
+            sb.append(sb1.toString());
+            s1 = sb1.toString();
+            sb1 = new StringBuilder();
+            sb1.append(s1);
+        }
+        //sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(0); //删掉第一个
+        System.out.println(sb);
+        return sb;
+    }
+    
+    public static void startgame()  throws Exception   //开始游戏
+    {
+          int mmp=0; int step=0; int left=0;
+        JSONObject jS=new JSONObject();//加入游戏      
+        String gameid=getHTML("http://202.207.12.223:8000/join_game/?user=lch2&password=36f10d0c1d2345110f8f14ff55bbba6e0bfca927789604aa08670f3b6e787487f1f2f9529ec46c89859f9aae045b3d12b2eb317670f4ddd3e715c2dd258b9f37f80559f6c76cfb0a8046a1366b5303cc77a061ced736c12806bcc10cafcd9768fee25bcbe5f3308f20565ff8f81128dbed936925b6a7a74ffbbe4cf6367b4d40&data_type=json");
+        jS=JSONObject.fromObject(gameid);
+        String game=jS.getString("game_id");
+        System.out.println(game);  //输出游戏id
+           while(game!=null)
+        {                      
+        String games=getHTML("http://202.207.12.223:8000/check_game/"+game);
+        jS=JSONObject.fromObject(games);
+        String gamestation1=jS.getString("winner");
+        System.out.print("游戏的获胜方"); 
+        System.out.println(gamestation1);    //输出游戏有没有结束
+        if(!gamestation1.equals("None")){   break;}
+        
+        String gamestation_step=jS.getString("step");
+        System.out.print("游戏步数"); 
+        System.out.println(gamestation_step);  //输出游戏步数
+         step=Integer.parseInt(gamestation_step);
+                    
+        String gamestation_board=jS.getString("board");
+         System.out.print("输出棋盘"); 
+        System.out.println(gamestation_board);      //输出棋盘
+        
+        String gamestation_ready=jS.getString("ready");
+        System.out.print("游戏是否就绪");   
+        System.out.println(gamestation_ready);      //输出游戏是否就绪
+        if(gamestation_ready.equals("True"))
+        {
+            String games0=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games0);
+            String gamestation_lefttime=jS.getString("left_time");
+            left=Integer.parseInt(gamestation_lefttime);  //判断超时
+            if(left<10){break;}
+            
+        String gamestation_creator_name1=jS.getString("creator_name");
+        String gamestation_creator_name2=jS.getString("opponent_name");
+        String gamestation_creator_stone1=jS.getString("creator_stone");
+        String gamestation_creator_stone2=jS.getString("opponent_stone");
+        String gamestation_creator_name= new String();
+        String gamestation_creator_stone= new String();
+        if(gamestation_creator_name1.equals("lch2"))
+        {
+            gamestation_creator_stone=gamestation_creator_stone1;
+        }
+        if(gamestation_creator_name2.equals("lch2"))
+        {
+            gamestation_creator_stone=gamestation_creator_stone2;
+        }
+        
+        System.out.print("我是黑棋还是白棋");  
+       System.out.println(gamestation_creator_stone);
+       
+        if(gamestation_creator_stone.equals("x"))
+        {
+            String games1=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games1);
+             gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            gamestation_board=jS.getString("board");
+            System.out.println("黑棋下");
+            while(step%2==1)
+            {
+            String games00=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games00);
+            gamestation_lefttime=jS.getString("left_time");
+            left=Integer.parseInt(gamestation_lefttime);  //判断超时
+            if(left<10){break;}
+           
+            String games2=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games2);
+            gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            Thread.sleep(3000);
+            }
+            if(left<10){break;}
+             if(mmp!=0)
+            {
+             String games4=getHTML("http://202.207.12.223:8000/check_game/"+game);
+             jS=JSONObject.fromObject(games4);
+            gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            gamestation_board=jS.getString("board");
+            System.out.print("再次输出棋盘"); 
+            System.out.println(gamestation_board);      //输出棋盘
+            gamestation1=jS.getString("winner");
+            if(!gamestation1.equals("None")){   break;}
+            System.out.println(getHTML("http://202.207.12.223:8000/play_game/"+game+"/?user=lch2&password=36f10d0c1d2345110f8f14ff55bbba6e0bfca927789604aa08670f3b6e787487f1f2f9529ec46c89859f9aae045b3d12b2eb317670f4ddd3e715c2dd258b9f37f80559f6c76cfb0a8046a1366b5303cc77a061ced736c12806bcc10cafcd9768fee25bcbe5f3308f20565ff8f81128dbed936925b6a7a74ffbbe4cf6367b4d40&coord="+SelectPoint(gamestation_board)));
+            }
+            
+            if(mmp==0)
+            {
+            String games3=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games3);
+            gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            gamestation_board=jS.getString("board");
+            System.out.print("再次输出棋盘"); 
+            System.out.println(gamestation_board);      //输出棋盘
+            System.out.println(getHTML("http://202.207.12.223:8000/play_game/"+game+"/?user=lch2&password=36f10d0c1d2345110f8f14ff55bbba6e0bfca927789604aa08670f3b6e787487f1f2f9529ec46c89859f9aae045b3d12b2eb317670f4ddd3e715c2dd258b9f37f80559f6c76cfb0a8046a1366b5303cc77a061ced736c12806bcc10cafcd9768fee25bcbe5f3308f20565ff8f81128dbed936925b6a7a74ffbbe4cf6367b4d40&coord=hh"));
+            mmp++;
+            }
+           
+            
+        }
+         if(gamestation_creator_stone.equals("o"))
+         {
+             String games5=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games5);
+             gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            gamestation_board=jS.getString("board");
+            
+             System.out.println("白棋下");
+             while(step%2==0)
+            {
+            String games01=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games01);
+            gamestation_lefttime=jS.getString("left_time");
+            left=Integer.parseInt(gamestation_lefttime);  //判断超时
+            if(left<10){break;}
+           
+            String games6=getHTML("http://202.207.12.223:8000/check_game/"+game);
+            jS=JSONObject.fromObject(games6);
+             gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            Thread.sleep(3000);
+            }
+             if(left<10){break;}
+              String games7=getHTML("http://202.207.12.223:8000/check_game/"+game);
+             jS=JSONObject.fromObject(games7);
+              gamestation_step=jS.getString("step");
+            step=Integer.parseInt(gamestation_step);
+            gamestation_board=jS.getString("board");
+         System.out.print("再次输出棋盘"); 
+         System.out.println(gamestation_board);      //输出棋盘
+           gamestation1=jS.getString("winner");
+           if(!gamestation1.equals("None")){   break;}
+        System.out.println(getHTML("http://202.207.12.223:8000/play_game/"+game+"/?user=lch2&password=36f10d0c1d2345110f8f14ff55bbba6e0bfca927789604aa08670f3b6e787487f1f2f9529ec46c89859f9aae045b3d12b2eb317670f4ddd3e715c2dd258b9f37f80559f6c76cfb0a8046a1366b5303cc77a061ced736c12806bcc10cafcd9768fee25bcbe5f3308f20565ff8f81128dbed936925b6a7a74ffbbe4cf6367b4d40&coord="+SelectPoint(gamestation_board))); ;
+         }
+         
+        }
+               Thread.sleep(1000);
+        }
+         
+    }
+
+    public static void main(String[] args) throws Exception 
+    {
+     while(1>0)
+     {
+         startgame();
+     }    
+         
+        
+        
+        
+        //System.out.println(getHTML("http://202.207.12.223:8000/play_game/"+game+"/?user=lch2&password=36f10d0c1d2345110f8f14ff55bbba6e0bfca927789604aa08670f3b6e787487f1f2f9529ec46c89859f9aae045b3d12b2eb317670f4ddd3e715c2dd258b9f37f80559f6c76cfb0a8046a1366b5303cc77a061ced736c12806bcc10cafcd9768fee25bcbe5f3308f20565ff8f81128dbed936925b6a7a74ffbbe4cf6367b4d40&coord="+SelectPoint("asdfgh")));
+        //System.out.println(a1.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")));      
+        // System.out.println(SelectPoint("hhifhjigkhjghghiihjhkjjijjij")+","+SelectPoint("hhigjhihjgiiifhgjijfkhkeli")+","+SelectPoint("hhjhiijjkijijkjgjfkhijiflihegdlh")+","+SelectPoint("hhkhlhihkgjimijfnjoklgjhjgigmgnglfli")+","+SelectPoint("hhjhihjiijjjjgjkjliihigjkgigkflehf")+","+SelectPoint("edfefdgdeeefhcdffccfffdddegbgcecicjchb")+","+SelectPoint("gheifhiihhihhiijighg")+","+SelectPoint("hhjhiijgghjjjkjijfkjig")+","+SelectPoint("ggffhggfhffgiefhfeheidehdidhgheg")+","+SelectPoint("hhjhiijgghjjjkjijfkjiggiijih")+","+SelectPoint("hhjhiijgghjjjkjijfkjiggi")+","+SelectPoint("ghhihhhggiggihfhigfjiiifjh")+","+SelectPoint("hhggfhghifgigfgjgkhfhkhiijfgjikh")+","+SelectPoint("hhihgihijgiiigjffjekgghggjghijhjgkiffijekdkfgl")+","+SelectPoint("hhjhihjiijjjjgjkjlii")+","+SelectPoint("hhjhihjiijjjjgjkjliihigjkgigkflehfhgifjf")+","+SelectPoint("ghhihhhggiggihfhigfjiiifjhkhjgjfhfgekfijkg"));
+        //System.out.println(SelectPoint("hhifhjigkhjghghiihjhkjjijjij"));
+      // System.out.println(getHTML("http://202.207.12.223:8000/join_game/?user=lch2&password=36f10d0c1d2345110f8f14ff55bbba6e0bfca927789604aa08670f3b6e787487f1f2f9529ec46c89859f9aae045b3d12b2eb317670f4ddd3e715c2dd258b9f37f80559f6c76cfb0a8046a1366b5303cc77a061ced736c12806bcc10cafcd9768fee25bcbe5f3308f20565ff8f81128dbed936925b6a7a74ffbbe4cf6367b4d40&data_type=json"));
+        //System.out.println(getHTML("http://202.207.12.223:8000/step_08/?ans="+SelectPoint("hhifhjigkhjghghiihjhkjjijjij")+","+SelectPoint("hhigjhihjgiiifhgjijfkhkeli")+","+SelectPoint("hhjhiijjkijijkjgjfkhijiflihegdlh")+","+SelectPoint("hhkhlhihkgjimijfnjoklgjhjgigmgnglfli")+","+SelectPoint("hhjhihjiijjjjgjkjliihigjkgigkflehf")+","+SelectPoint("edfefdgdeeefhcdffccfffdddegbgcecicjchb")+","+SelectPoint("gheifhiihhihhiijighg")+","+SelectPoint("hhjhiijgghjjjkjijfkjig")+","+SelectPoint("ggffhggfhffgiefhfeheidehdidhgheg")+","+SelectPoint("hhjhiijgghjjjkjijfkjiggiijih")+","+SelectPoint("hhjhiijgghjjjkjijfkjiggi")+","+SelectPoint("ghhihhhggiggihfhigfjiiifjh")+","+SelectPoint("hhggfhghifgigfgjgkhfhkhiijfgjikh")+","+SelectPoint("hhihgihijgiiigjffjekgghggjghijhjgkiffijekdkfgl")+","+SelectPoint("hhjhihjiijjjjgjkjlii")+","+SelectPoint("hhjhihjiijjjjgjkjliihigjkgigkflehfhgifjf")+","+SelectPoint("ghhihhhggiggihfhigfjiiifjhkhjgjfhfgekfijkg")));
+      
+    }
+}

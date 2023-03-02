@@ -1,0 +1,855 @@
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+//import sun.jvm.hotspot.tools.SysPropsDumper;
+
+import java.math.BigInteger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+
+public class HelloJava {
+	//第四步
+	public static BigInteger a=new BigInteger("328357472");       
+	public static BigInteger b=new BigInteger("594991573");
+	public static BigInteger c=new BigInteger("187942120");
+	public static BigInteger d=new BigInteger("822832550");
+	public static BigInteger e=new BigInteger("2428");
+	public static BigInteger f=new BigInteger("828985668633");
+	public static BigInteger g=new BigInteger("3233");
+	public static BigInteger h=new BigInteger("904874541");
+	public static BigInteger i=new BigInteger("469972483897");
+	public static BigInteger j=new BigInteger("165124671");
+
+	//第5.1步  
+	//public static BigInteger num=new BigInteger("31415926"); 	
+    public static String SelectPoint(String s) //获得每一个位置的权重
+	 {
+	        int sum[];//返回每一个位置的分数
+	        int p = 0;
+	        int q = 0;
+	        sum = new int[225];
+	        int summax[];
+	        int max=0; int tag=0;
+	        summax = new int[225];
+	        for (int i = 0; i < 225; i++) //初始化
+	        {
+	            sum[i] = 0;
+	            summax[i] = 0;
+	        }
+	     int hang=0;int lie=0;String cshanglie=new String();
+	     char chang;char clie;
+	        StringBuilder sb = new StringBuilder();
+	        StringBuilder sb1 = new StringBuilder();
+	        String s1 = new String();
+	        int temp = 1;
+	        for (int j = 0; j < 15; j++) {     //初始化棋盘
+	            for (int k = 0; k < 15; k++) {
+	                sb1.append(".");
+	            }
+	        }
+	        s1 = sb1.toString();
+	        for (int i = 0; i < s.length(); i += 2) {
+	            char a = s.charAt(i);
+	            char b = s.charAt(i + 1);
+	            // System.out.println(a);
+	            // System.out.println(b);
+	            int index = (a - 'a') * 15 + b - 'a';
+	            if (temp == 1) {
+	                sb1.replace(index, index + 1, "x");
+	                temp = 2;
+	            } else if (temp == 2) {
+	                sb1.replace(index, index + 1, "o");
+	                temp = 1;
+	            }
+	            sb.append(",");
+	            sb.append(sb1.toString());
+	            s1 = sb1.toString();
+	            sb1 = new StringBuilder();
+	            sb1.append(s1);
+	        }
+	        //sb.deleteCharAt(sb.length()-1);
+	        sb.deleteCharAt(0); //删掉第一个
+	       // System.out.println(s1);//s1是最终棋盘形式
+
+	        StringBuilder headx = new StringBuilder();//黑子为M的分数
+	        StringBuilder heado = new StringBuilder();//白子为M的分数
+	        String s_headx = new String();//黑子棋盘
+	        String s_heado = new String();//白子棋盘
+	        headx.append(s1);
+	        heado.append(s1);
+	        s_headx = s1;
+	        s_heado = s1;
+	        s_headx = s_headx.replaceAll("x", "M");
+	        s_headx = s_headx.replaceAll("o", "O");
+	        s_heado = s_heado.replaceAll("o", "M");
+	        s_heado = s_heado.replaceAll("x", "O");
+//	        System.out.println(s_headx);//黑子棋盘
+//	        System.out.println(s_heado);//白子棋盘
+//	        System.out.println(temp);//下一步是黑棋下还是白棋下
+	        if (temp == 1) {
+	            for (q = 0; q < 225; q++) {
+	                if (s_headx.charAt(q) == '.'){
+	                    sum[q] = GetAround(s_headx, q);
+	                }
+	             
+	            }
+	            for(int i=0;i<225;i++)
+	            {
+	                if(sum[0]<sum[i])
+	                {
+	                    int mmp=0;
+	                    mmp=sum[0];
+	                    sum[0]=sum[i];
+	                    sum[i]=mmp;
+	                    tag=i;
+	                }
+	            }
+	          //  System.out.println(sum[0]);
+	          //  int index = (a - 'a') * 15 + b - 'a';
+	              hang=tag/15;
+	              lie=tag%15;
+	              hang=hang+(int)'a';chang=(char)hang;      //将数字坐标转化为字母坐标
+	              lie=lie+(int)'a';clie=(char)lie;
+	              cshanglie=""+chang+clie;
+	         //  System.out.println(chang);
+	         //  System.out.println(clie);
+	         //  System.out.println(cshanglie);
+	         }
+	            if (temp == 2) {
+	                for (p = 0; p < 225; p++) {
+	                    if (s_heado.charAt(p) == '.') {
+	                        sum[p] = GetAround(s_heado, p);
+	                    }
+	                }
+	                for(int i=0;i<225;i++)
+	            {
+	                if(sum[0]<sum[i])
+	                {
+	                     int mmp=0;
+	                    mmp=sum[0];
+	                    sum[0]=sum[i];
+	                    sum[i]=mmp;
+	                    tag=i;
+	                }
+	            }
+	            //    System.out.println(sum[0]);
+	                hang=tag/15;
+	                lie=tag%15;
+	                hang=hang+(int)'a';chang=(char)hang;
+	                lie=lie+(int)'a';clie=(char)lie;
+	                cshanglie=""+chang+clie;
+	            //  System.out.println(chang);
+	            //  System.out.println(clie);
+	            //  System.out.println(cshanglie);
+	            }
+	          
+	        return cshanglie;
+	    }   
+    public static int GetAround(String s, int around) //考察点的棋型7
+     {
+
+	        String a_sb = new String();
+	        StringBuilder b_sb1 = new StringBuilder();
+	        StringBuilder b_sb2 = new StringBuilder();
+	        StringBuilder b_sb3 = new StringBuilder();
+	        StringBuilder b_sb4 = new StringBuilder();
+	        StringBuilder b_sb12 = new StringBuilder();
+	        StringBuilder b_sb13 = new StringBuilder();
+	        StringBuilder b_sb14 = new StringBuilder();
+	        StringBuilder b_sb23 = new StringBuilder();
+	        StringBuilder b_sb24 = new StringBuilder();
+	        StringBuilder b_sb34 = new StringBuilder();
+	        StringBuilder b_sb = new StringBuilder();
+
+	        int sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0,sum12=0,sum13=0,sum14=0,sum23=0,sum24=0,sum34=0;
+	        int sum = 0;
+	        b_sb = b_sb.append(s);
+	        b_sb.replace(around, around + 1, "C");
+	        a_sb = b_sb.toString();
+	        //char a=around.charAt(j);
+	        //char b=around.charAt(j+1);
+	        //  System.out.println(a);//输出横坐标
+	        // System.out.println(b);//输出纵坐标
+	        // int index=(a-'a')*15+b-'a';//在一维数组中获得该点的数字位置
+	        int index = around;//将C那个点给index
+
+	        for (int k = 0; k < 225; k++) {
+	            if (k == index - 4 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 3 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 2 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 1 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index && k >= 0) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 1 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 2 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 3 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 4 && k / 15 == index / 15) {
+	                b_sb1.append(a_sb.charAt(k));
+	            }
+	        }
+	        sum1 = score(b_sb1.toString());//调用score函数
+	        //  System.out.println(b_sb1);
+	        //b_sb.append(",");
+
+	        for (int k = 0; k < 225; k++) {
+	            if (k == index - 64 && (Math.abs((k % 15) - (index % 15)) < 6))//列数的绝对值差为1
+	            {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 48 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 32 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 16 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 16 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 32 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 48 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 64 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb2.append(a_sb.charAt(k));
+	            }
+	        }
+	        //b_sb.append(",");
+	        sum2 = score(b_sb2.toString());
+	        //   System.out.println(b_sb2);
+
+	        for (int k = 0; k < 225; k++) {
+	            if (k == index - 60 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 45 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 30 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 15 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 15 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 30 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 45 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 60 && k >= 0) {
+	                b_sb3.append(a_sb.charAt(k));
+	            }
+	        }
+	        // b_sb.append(",");
+	        sum3 = score(b_sb3.toString());
+	        //  System.out.println(b_sb3);
+
+	        for (int k = 0; k < 225; k++) {
+	            if (k == index - 56 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 42 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 28 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index - 14 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 14 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 28 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 42 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	            if (k == index + 56 && (Math.abs((k % 15) - (index % 15)) < 6)) {
+	                b_sb4.append(a_sb.charAt(k));
+	            }
+	        }
+	        //b_sb.append(",");
+	        sum4 = score(b_sb4.toString());
+	        // System.out.println(b_sb4);
+	        // b_sb12=b_sb12.append(b_sb1); b_sb12=b_sb12.append(b_sb2); sum12=score(b_sb12.toString());
+	        // b_sb13=b_sb13.append(b_sb1); b_sb13=b_sb13.append(b_sb3); sum13=score(b_sb13.toString());
+	         //b_sb14=b_sb14.append(b_sb1); b_sb14=b_sb14.append(b_sb4); sum14=score(b_sb14.toString());
+	         //b_sb23=b_sb23.append(b_sb2); b_sb23=b_sb23.append(b_sb3); sum23=score(b_sb23.toString());
+	        // b_sb24=b_sb24.append(b_sb2); b_sb24=b_sb24.append(b_sb4); sum24=score(b_sb24.toString());
+	        // b_sb34=b_sb34.append(b_sb3); b_sb34=b_sb34.append(b_sb4); sum34=score(b_sb34.toString());
+	        //System.out.println(sum1 + sum2 + sum3 + sum4);
+	        sum = sum1 + sum2 + sum3 + sum4;
+	        return sum;
+	    }
+    public static int score(String s) //获得一个点一条线的权重
+    {
+        int sum = 0;
+        String str1_1 = new String();
+        str1_1 = "CMMMM";
+        String str1_2 = new String();
+        str1_2 = "MCMMM";
+        String str1_3 = new String();
+        str1_3 = "MMCMM";
+        String str1_4 = new String();
+        str1_4 = "MMMCM";
+        String str1_5 = new String();
+        str1_5 = "MMMMC";
+        int scr1 = 10000;
+        if (s.indexOf(str1_1) > -1) {
+            sum = sum + scr1;
+           
+        }
+        if (s.indexOf(str1_2) > -1) {
+            sum = sum + scr1;
+           
+        }
+        if (s.indexOf(str1_3) > -1) {
+            sum = sum + scr1;
+            
+        }
+        if (s.indexOf(str1_4) > -1) {
+            sum = sum + scr1;
+        }
+        if (s.indexOf(str1_5) > -1) {
+            sum = sum + scr1;
+        }
+
+        String str2_1 = new String();
+        str2_1 = "OOOOC";
+        String str2_2 = new String();
+//        str2_2 = "COOOO";
+//        String str2_3 = new String();
+//        str2_3 = "OCOOO";
+//        String str2_4 = new String();
+//        str2_4 = "OOCOO";
+//        String str2_5 = new String();
+//        str2_5 = "OOOCO";
+//        int scr2 = 8000;
+        int scr2 = 8000;
+        if (s.indexOf(str2_1) > -1) {
+            sum = sum + scr2;
+        }
+        if (s.indexOf(str2_2) > -1) {
+            sum = sum + scr2;
+        }
+//        if (s.indexOf(str2_3) > -1) {
+//            sum = sum + scr2;
+//        }
+//        if (s.indexOf(str2_4) > -1) {
+//            sum = sum + scr2;
+//        }
+//        if (s.indexOf(str2_5) > -1) {
+//            sum = sum + scr2;
+//        }
+
+        String str3_1 = new String();
+        str3_1 = ".CMMM.";
+        String str3_2 = new String();
+        str3_2 = ".MCMM.";
+        String str3_3 = new String();
+        str3_3 = ".MMCM.";
+        String str3_4 = new String();
+        str3_4 = ".MMMC.";
+        int scr3 = 5000;
+        if (s.indexOf(str3_1) > -1) {
+            sum = sum + scr3;
+        }
+        if (s.indexOf(str3_2) > -1) {
+            sum = sum + scr3;
+        }
+        if (s.indexOf(str3_3) > -1) {
+            sum = sum + scr3;
+        }
+        if (s.indexOf(str3_4) > -1) {
+            sum = sum + scr3;
+        }
+
+        String str4_1 = new String();
+        str4_1 = "COOO.";
+        String str4_2 = new String();
+        str4_2 = ".OOOC";
+        String str4_3 = new String();
+        str4_3 = ".OOCO.";
+        String str4_4 = new String();
+        str4_4 = ".OCOO.";
+//        int scr4 = 3500;
+        int scr4 = 2500;
+        if (s.indexOf(str4_1) > -1) {
+            sum = sum + scr4;
+        }
+        if (s.indexOf(str4_2) > -1) {
+            sum = sum + scr4;
+        }
+        if (s.indexOf(str4_3) > -1) {
+            sum = sum + scr4;
+        }
+        if (s.indexOf(str4_4) > -1) {
+            sum = sum + scr4;
+        }
+
+        String str5_1 = new String();
+        str5_1 = "OCMMM.";
+        String str5_2 = new String();
+        str5_2 = "OMCMM.";
+        String str5_3 = new String();
+        str5_3 = "OMMCM.";
+        String str5_4 = new String();
+        str5_4 = "OMMMC.";
+        String str5_5 = new String();
+        str5_5 = ".CMMMO";
+        String str5_6 = new String();
+        str5_6 = ".MCMMO";
+        String str5_7 = new String();
+        str5_7 = ".MMCMO";
+        String str5_8 = new String();
+        str5_8 = ".MMMCO";
+        int scr5 = 2000;
+        if (s.indexOf(str5_1) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_2) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_3) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_4) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_5) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_6) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_7) > -1) {
+            sum = sum + scr5;
+        }
+        if (s.indexOf(str5_8) > -1) {
+            sum = sum + scr5;
+        }
+
+        String str6_1 = new String();
+        str6_1 = ".MMC.";
+        String str6_2 = new String();
+        str6_2 = ".MCM.";
+        String str6_3 = new String();
+        str6_3 = ".CMM.";
+        int scr6 = 400;
+        if (s.indexOf(str6_1) > -1) {
+            sum = sum + scr6;
+        }
+        if (s.indexOf(str6_2) > -1) {
+            sum = sum + scr6;
+        }
+        if (s.indexOf(str6_3) > -1) {
+            sum = sum + scr6;
+        }
+
+        String str7_1 = new String();
+        str7_1 = ".OOC";
+        String str7_2 = new String();
+        str7_2 = "COO.";
+        String str7_3 = new String();
+        str7_3 = "MOOOC";
+        String str7_4 = new String();
+        str7_4 = "COOOM";
+//        String str7_5 = new String();
+//        str7_5 = ".OCO";
+//        String str7_6 = new String();
+//        str7_6 = "OCO.";
+        int scr7 = 400;
+        if (s.indexOf(str7_1) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_2) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_3) > -1) {
+            sum = sum + scr7;
+        }
+        if (s.indexOf(str7_4) > -1) {
+            sum = sum + scr7;
+        }
+//        if (s.indexOf(str7_5) > -1) {
+//            sum = sum + scr7;
+//        }
+//        if (s.indexOf(str7_6) > -1) {
+//            sum = sum + scr7;
+//        }
+
+        String str8_1 = new String();
+        str8_1 = ".MMCO";
+        String str8_2 = new String();
+        str8_2 = ".MCMO";
+        String str8_3 = new String();
+        str8_3 = ".CMMO";
+        String str8_4 = new String();
+        str8_4 = "OMMC.";
+        String str8_5 = new String();
+        str8_5 = "OMCM.";
+        String str8_6 = new String();
+        str8_6 = "OCMM.";
+        String str8_7 = new String();
+        str8_7 = "MOOC";
+        String str8_8 = new String();
+        str8_8 = "COOM";
+        int scr8 = 200;
+        if (s.indexOf(str8_1) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_2) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_3) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_4) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_5) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_6) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_7) > -1) {
+            sum = sum + scr8;
+        }
+        if (s.indexOf(str8_8) > -1) {
+            sum = sum + scr8;
+        }
+
+        String str9_1 = new String();
+        str9_1 = ".MC.";
+        String str9_2 = new String();
+        str9_2 = ".CM.";
+//        int scr9 = 100;
+        int scr9 = 50;
+        if (s.indexOf(str9_1) > -1) {
+            sum = sum + scr9;
+        }
+        if (s.indexOf(str9_2) > -1) {
+            sum = sum + scr9;
+        }
+//        
+//        String str10_1 = new String();
+//        str10_1 = ".OC.";
+//        String str10_2 = new String();
+//        str10_2 = ".CO.";
+//        int scr10 = 50;
+//        if (s.indexOf(str10_1) > -1) {
+//            sum = sum + scr10;
+//        }
+//        if (s.indexOf(str10_2) > -1) {
+//            sum = sum + scr10;
+//        }
+        
+
+        int scr_other = 20;
+        if (sum == 0) {
+            sum = sum + scr_other;
+        }//其他棋型
+
+        return sum;
+    }
+    public static String getHTML(String urlToRead) throws Exception {
+      StringBuilder result = new StringBuilder();
+      URL url = new URL(urlToRead);
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+      BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+      String line;
+      while ((line = rd.readLine()) != null) {
+         result.append(line);
+      }
+      rd.close();
+      return result.toString();
+    }
+    public static char[][] get7(String board) {
+
+		StringBuilder sc=new StringBuilder();
+		int temp=1;
+		for(int i=0;i<225;i++)
+		{
+			sc.append(".");
+		}
+		for(int i=0;i<board.length();i+=2) {
+			char a=board.charAt(i);
+			char b=board.charAt(i+1);
+			int index = (a - 'a') * 15 + b - 'a';
+            if (temp == 1) {
+                sc.replace(index, index + 1, "x");
+                temp = 2;
+            } else if (temp == 2) {
+                sc.replace(index, index + 1, "o");
+                temp = 1;
+            }
+		}
+		//System.out.println(sc);
+		String sc_1;
+		sc_1=sc.toString();
+		char changea[]=sc_1.toCharArray();//利用toCharArray方法转换
+		char changeb[][]=new char[15][15];
+		int c=0;
+		for(int i=0;i<15;i++)
+		{
+			for(int j=0;j<15;j++)
+			{
+				changeb[i][j]=changea[c];
+				c++;
+				//System.out.println(changeb[i][j]);
+			}
+		}
+		
+		return changeb;
+		
+	}
+    public static void get77(char nboard[][],String coord[]){
+
+        int  m ;
+        int x = 0, y = 0;
+        for (m = 0; m < coord.length; m++) 
+        {
+            String s = coord[m];
+            int yy = 0;
+            while (yy < s.length() - 1) 
+            {
+                int s2,s4;
+                x = s.charAt(yy) - 'a';//转换数字
+                y = s.charAt(yy + 1) - 'a';
+                for (s2 = x, s4 = y - 4; s4 <=y + 4; s4++) 
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15))
+                    {    
+   
+                       System.out.print(nboard[s2][s4]);
+                        
+                    }
+                      
+                }
+               System.out.print(",");
+                 yy+=2;
+                for (s2 = x - 4, s4 = y - 4; s4 <= y + 4 && s2 <= x + 4; s4++, s2++)
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15))
+                    {
+                         System.out.print(nboard[s2][s4]);
+                        
+                    }
+                     
+                }
+                System.out.print(",");
+                for (s2 = x - 4, s4 = y; s2 <= x + 4; s2++)
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15)) 
+                    {
+                         System.out.print(nboard[s2][s4]);
+                    }
+                      
+                }
+                System.out.print(",");
+                for (s2 = x + 4, s4 = y - 4; s4 <= y + 4 && s2>=x - 4; s4++, s2--) 
+                {
+                    if ((s2 >= 0 && s2 < 15) && (s4 >= 0 && s4 < 15)) 
+                    {
+                        System.out.print(nboard[s2][s4]);
+                    }
+                    
+                }
+                  if(m<coord.length-1)
+                  System.out.println(",");
+            }
+            
+        }  
+  }
+    public static BigInteger str2num(String s)//转换为256进制
+    {
+       s=new StringBuffer(s).reverse().toString();
+       BigInteger total=new BigInteger("0");
+       int l=s.length();
+       for(int i=0;i<l;i++){
+           char c=s.charAt(i);
+           BigInteger m=new BigInteger("256");
+           m=m.pow(i);
+           BigInteger n=new BigInteger(String.valueOf((int)(c)));
+           total=total.add(m.multiply(n));
+      }
+   return total;
+   }
+    public static StringBuilder GetMap(String s) //得到每一步棋的地图6
+    {
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        String s1 = new String();
+        int temp = 1;
+        for (int j = 0; j < 15; j++) {     //初始化棋盘
+            for (int k = 0; k < 15; k++) {
+                sb1.append(".");
+            }
+        }
+        s1 = sb1.toString();
+        for (int i = 0; i < s.length(); i += 2) {
+            char a = s.charAt(i);
+            char b = s.charAt(i + 1);
+            System.out.println(a);
+            System.out.println(b);
+            int index = (a - 'a') * 15 + b - 'a';
+            if (temp == 1) {
+                sb1.replace(index, index + 1, "x");
+                temp = 2;
+            } else if (temp == 2) {
+                sb1.replace(index, index + 1, "o");
+                temp = 1;
+            }
+            sb.append(",");
+            sb.append(sb1.toString());
+            s1 = sb1.toString();
+            sb1 = new StringBuilder();
+            sb1.append(s1);
+        }
+        //sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(0); //删掉第一个
+        System.out.println(sb);
+        return sb;
+    }
+    public static void main(String[] args) throws Exception
+   {
+	   
+//第四步
+//	   System.out.println(a.modPow(new BigInteger("422491626"), new BigInteger("409553375")));
+//       System.out.println(b.modPow(new BigInteger("883417601"), new BigInteger("314")));
+//       System.out.println(c.modPow(new BigInteger("5454"), new BigInteger("9584")));
+//       System.out.println(d.modPow(new BigInteger("973950441"), new BigInteger("637694487")));
+//       System.out.println(e.modPow(new BigInteger("517402543754"), new BigInteger("241040558148")));
+//       System.out.println(f.modPow(new BigInteger("124148072"), new BigInteger("66")));
+//       System.out.println(g.modPow(new BigInteger("8135"), new BigInteger("147364890446")));
+//       System.out.println(h.modPow(new BigInteger("357277884063"), new BigInteger("433690028")));
+//       System.out.println(i.modPow(new BigInteger("294753086"), new BigInteger("256800708")));
+//       System.out.println(j.modPow(new BigInteger("277291686889"), new BigInteger("740208595")));
+// 第5.1步
+//     System.out.println(num.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")));
+//    
+//第5.2步   
+//	   String s="hello, world!";
+//	   BigInteger strnum2 =str2num( s);
+//	   System.out.println(strnum2);
+
+//第5。3步
+//	   BigInteger str3=new BigInteger("8271117963530313756381553648673");   
+//	   System.out.println(str3.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")));
+//	
+//第5.4步
+//	   BigInteger str4=new BigInteger("41717036756922086167767786786712423269418006844571540642506559265291791915434146228186913317848309015094527019477424371059092802944619669306914382602706827360526972065492061812094685980946805703427198780190727908992795654922187272049190698839062058797703366041101170679313306423879973490422740979302379859262");
+//     System.out.println(str4.toString(16));
+	   
+//第5.5步
+//	   String str5="760817";
+//	   BigInteger str5_=str2num(str5);
+//	   BigInteger str5_5=(str5_.modPow(new BigInteger("65537"), new BigInteger("135261828916791946705313569652794581721330948863485438876915508683244111694485850733278569559191167660149469895899348939039437830613284874764820878002628686548956779897196112828969255650312573935871059275664474562666268163936821302832645284397530568872432109324825205567091066297960733513602409443790146687029")));
+//	   System.out.println(str5_5.toString(16));
+//第六步
+//	   String str6="ggffhggfhffgiefhfeheidehdidhghegcidfgiefcfeeeied";
+//	   GetMap(str6);
+//第七步
+//    	String board="ghhggggfgigjhhfhiijjfghiihigjhkhhjgkjgffhfkgjijfiejdjeheidkfkikekdlfmgmfifnf";
+//	    String coord[]=new String[] {"nk", "ok", "bn", "ef", "lk", "im", "gb", "fd", "ha"};
+//	    char newboard[][]=get7(board);
+//	    get77(newboard,coord);
+//第八步
+    	String board1="hhifhjigkhjghghiihjhkjjijjij";
+    	System.out.println(SelectPoint(board1)); 
+    	String board2="hhigjhihjgiiifhgjijfkhkeli";
+    	System.out.println(SelectPoint(board2)); 
+    	String board3="hhjhiijjkijijkjgjfkhijiflihegdlh";
+    	System.out.println(SelectPoint(board3)); 
+    	String board4="hhkhlhihkgjimijfnjoklgjhjgigmgnglfli";
+    	System.out.println(SelectPoint(board4)); 
+    	String board5="hhjhihjiijjjjgjkjliihigjkgigkflehf";
+    	System.out.println(SelectPoint(board5)); 
+    	String board6="edfefdgdeeefhcdffccfffdddegbgcecicjchb";
+    	System.out.println(SelectPoint(board6)); 
+    	String board7="gheifhiihhihhiijighg";
+    	System.out.println(SelectPoint(board7)); 
+    	String board8="hhjhiijgghjjjkjijfkjig";
+    	System.out.println(SelectPoint(board8)); 
+    	String board9="ggffhggfhffgiefhfeheidehdidhgheg";
+    	System.out.println(SelectPoint(board9)); 
+    	String board10="hhjhiijgghjjjkjijfkjiggiijih";
+    	System.out.println(SelectPoint(board10)); 
+    	String board11="hhjhiijgghjjjkjijfkjiggi";
+    	System.out.println(SelectPoint(board11)); 
+    	String board12="ghhihhhggiggihfhigfjiiifjh";
+    	System.out.println(SelectPoint(board12));
+    	String board13="hhggfhghifgigfgjgkhfhkhiijfgjikh";
+    	System.out.println(SelectPoint(board13));
+    	String board14="hhihgihijgiiigjffjekgghggjghijhjgkiffijekdkfgl";
+    	System.out.println(SelectPoint(board14));
+    	String board15="hhjhihjiijjjjgjkjlii";
+    	System.out.println(SelectPoint(board15));
+    	String board16="hhjhihjiijjjjgjkjliihigjkgigkflehfhgifjf";
+    	System.out.println(SelectPoint(board16));
+    	String board17="ghhihhhggiggihfhigfjiiifjhkhjgjfhfgekfijkg";
+    	System.out.println(SelectPoint(board17));
+   	
+    	
+	   
+	   
+       //System.out.println(getHTML("http://202.207.12.223:8000/step_02?name=aaaqaaaaaa&student_number=0161123535"));
+       //System.out.println(getHTML("http://202.207.12.223:8000/step_04?ans=64634529,299,6400,176532182,6846168988,45,79588877111,263643289,226407121,224825711"));
+       //System.out.println(getHTML("http://202.207.12.223:8000/context/eb63fffd85c01a0a5d8f3cadea18cf56?num=93881021929864980809174342694135963369278672668363116591635346676508616959803466385395110947590572285871635015799641415119061735125830808855763471006378541296998154431918842025919210489545546222811516276906010085975565730381040208928087282527065856602316379316169602170574703110733688951416363596477076057604"));
+       //System.out.println(getHTML("http://202.207.12.223:8000/step_05?num=93881021929864980809174342694135963369278672668363116591635346676508616959803466385395110947590572285871635015799641415119061735125830808855763471006378541296998154431918842025919210489545546222811516276906010085975565730381040208928087282527065856602316379316169602170574703110733688951416363596477076057604"));
+       //System.out.println(getHTML("http://202.207.12.223:8000/step_05?str2num=8271117963530313756381553648673"));
+       //System.out.println(getHTML("http://202.207.12.223:8000/step_05?str=41717036756922086167767786786712423269418006844571540642506559265291791915434146228186913317848309015094527019477424371059092802944619669306914382602706827360526972065492061812094685980946805703427198780190727908992795654922187272049190698839062058797703366041101170679313306423879973490422740979302379859262"));
+	   //System.out.println(getHTML("http://202.207.12.223:8000/step_05?hex=3b68334487f782c227eefff8510c6d7b8568e50580e1d585360df7b381c15bc663ab6e867a475b52921ef254cfcbe328e074d5761e605b6aa8ab608fc9914a58d1120294986dcff70b46e92fa7d48edf4dbb104fa272eb459e8896e29d5d0473f75bb866d9f73ec1c134d827156ee355d19bdd94b8d73fe2526ada033a5cad3e"));
+	   //System.out.println(getHTML("http://202.207.12.223:8000/step_05?user=aaaqaaaaaa&password=632a67c81486d124239aab9573d44390f19001eae142470b3ae7e3133656b649ed542221d38f674a4839bf1ffc02eabcd72dbc74b8c529afe50a51fe8634b3545e73cbac3527fbcf92f8ab7ea3d5e5cf04122e101fbb49be23363ee3e0fc3ecdbbd271d26f297f4ac2504a328246f176e33197628636f73a772d3add8e3e2e9d"));
+       //System.out.println(getHTML("http://202.207.12.223:8000/step_06?ans=................................................................................................x................................................................................................................................,................................................................................o...............x................................................................................................................................,................................................................................o...............x..............x.................................................................................................................,................................................................................o..............ox..............x.................................................................................................................,................................................................................o..............ox.............xx.................................................................................................................,................................................................................oo.............ox.............xx.................................................................................................................,................................................................................oo.............ox.............xx............x....................................................................................................,................................................................................ooo............ox.............xx............x....................................................................................................,...............................................................................xooo............ox.............xx............x....................................................................................................,...............................................................................xooo............ox............oxx............x....................................................................................................,...............................................................................xooo............ox............oxx...........xx....................................................................................................,...................................................................o...........xooo............ox............oxx...........xx....................................................................................................,.....................................................x.............o...........xooo............ox............oxx...........xx....................................................................................................,....................................................ox.............o...........xooo............ox............oxx...........xx....................................................................................................,....................................................ox.............o...........xooo............oxx...........oxx...........xx....................................................................................................,....................................................ox............oo...........xooo............oxx...........oxx...........xx....................................................................................................,......................................x.............ox............oo...........xooo............oxx...........oxx...........xx....................................................................................................,......................................x...........o.ox............oo...........xooo............oxx...........oxx...........xx....................................................................................................,......................................x...........o.ox............oo...........xooo............oxxx..........oxx...........xx....................................................................................................,......................................x...........o.ox...........ooo...........xooo............oxxx..........oxx...........xx....................................................................................................,...................................x..x...........o.ox...........ooo...........xooo............oxxx..........oxx...........xx....................................................................................................,...................................x..x...........o.ox..........oooo...........xooo............oxxx..........oxx...........xx....................................................................................................,...................................x..x...........o.ox..........oooox..........xooo............oxxx..........oxx...........xx....................................................................................................,...................................x..x...........o.ox.........ooooox..........xooo............oxxx..........oxx...........xx...................................................................................................."));
+	   //System.out.print(getHTML("http://202.207.12.223:8000/step_07?ans=.........,xo....,......,......,.........,o....,.....,.....,......,...,......,......,.........,.....xxo.,.....ooxx,.........,.........,oxx.....,........,........,x......,..o....,.........,.......,.....o,...xxo,.........,......,.....oxo,.....xox,.......xo,........,....o,...x.,.........,....."));
+       System.out.print(getHTML("http://202.207.12.223:8000/step_08?ans=ki,mj,ih,le,hg,ia,eh,gi,ci,hi,ke,kh,gl,gm,hi,kh,hj"));
+   
+   
+   }
+
+}
